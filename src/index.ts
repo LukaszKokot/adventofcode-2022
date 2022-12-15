@@ -1,11 +1,15 @@
 import { open } from 'node:fs/promises';
 
-export const computeMostCaloriesCarriedByElf = async (
-  inputFilePath: string
-): Promise<number | undefined> => {
+export const computeMostCaloriesCarriedByElves = async ({
+  inputFilePath,
+  numberOfElvesToCount = 1,
+}: {
+  inputFilePath: string;
+  numberOfElvesToCount?: number;
+}): Promise<number | undefined> => {
   const file = await open(inputFilePath);
+  let topNMaxCalories = new Array<number>();
   let calories = 0;
-  let maxCalories = 0;
 
   for await (const line of file.readLines()) {
     const lineCalories = parseInt(line);
@@ -13,16 +17,29 @@ export const computeMostCaloriesCarriedByElf = async (
     if (!isNaN(lineCalories)) {
       calories += lineCalories;
     } else {
-      if (maxCalories <= calories) {
-        maxCalories = calories;
-      }
+      addOnlyIfGreaterThanOne(calories, numberOfElvesToCount, topNMaxCalories);
       calories = 0;
     }
   }
 
-  if (calories > maxCalories) {
-    maxCalories = calories;
-  }
+  addOnlyIfGreaterThanOne(calories, numberOfElvesToCount, topNMaxCalories);
 
-  return maxCalories;
+  return topNMaxCalories.reduce((sum: number, currentValue: number) => {
+    return sum + currentValue;
+  }, 0);
+};
+
+const addOnlyIfGreaterThanOne = (
+  value: number,
+  maxValues: number,
+  values: Array<number>
+): void => {
+  if (values.length < maxValues || values.some(v => v < value)) {
+    values.push(value);
+    values.sort((a: number, b: number) => b - a);
+
+    if (values.length > maxValues) {
+      values.pop();
+    }
+  }
 };
