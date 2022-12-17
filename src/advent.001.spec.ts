@@ -1,4 +1,4 @@
-import { computeMostCaloriesCarriedByElves } from '.';
+import { computeMostCaloriesCarriedByElves } from './advent.001';
 
 describe('Advent 01', () => {
   describe('On an empty file', () => {
@@ -15,7 +15,7 @@ describe('Advent 01', () => {
     it('should return its calories', async () => {
       await expect(
         computeMostCaloriesCarriedByElves({
-          inputFilePath: `${__dirname}/test-data/one-elf.txt`,
+          inputFilePath: `${__dirname}/test-data/advent.001/one-elf.txt`,
         })
       ).resolves.toBe(10000);
     });
@@ -25,7 +25,7 @@ describe('Advent 01', () => {
     it('should return the most calories', async () => {
       await expect(
         computeMostCaloriesCarriedByElves({
-          inputFilePath: `${__dirname}/test-data/many-elves.txt`,
+          inputFilePath: `${__dirname}/test-data/advent.001/many-elves.txt`,
         })
       ).resolves.toBe(24000);
     });
@@ -36,7 +36,7 @@ describe('Advent 01', () => {
       it('should return the most calories', async () => {
         await expect(
           computeMostCaloriesCarriedByElves({
-            inputFilePath: `${__dirname}/test-data/all-elves.txt`,
+            inputFilePath: `${__dirname}/test-data/advent.001/all-elves.txt`,
           })
         ).resolves.toMatchInlineSnapshot(`70509`);
       });
@@ -46,7 +46,7 @@ describe('Advent 01', () => {
       it('should return the sum of most calories', async () => {
         await expect(
           computeMostCaloriesCarriedByElves({
-            inputFilePath: `${__dirname}/test-data/all-elves.txt`,
+            inputFilePath: `${__dirname}/test-data/advent.001/all-elves.txt`,
             numberOfElvesToCount: 3,
           })
         ).resolves.toMatchInlineSnapshot(`208567`);
