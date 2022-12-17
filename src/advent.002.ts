@@ -12,11 +12,52 @@ enum MY_PLAYS {
   SCISSORS = 'Z',
 }
 
+enum EXPECTED_RESULT {
+  LOSS = 'X',
+  DRAW = 'Y',
+  WIN = 'Z',
+}
+
 enum PLAY_RESULT {
   LOSS = 0,
   DRAW = 3,
   WIN = 6,
 }
+
+const getExpectedPlay = (
+  otherPlay: THEIR_PLAYS,
+  expectedResult: EXPECTED_RESULT
+): MY_PLAYS => {
+  switch (expectedResult) {
+    case EXPECTED_RESULT.DRAW: {
+      return MY_PLAYS[
+        Object.keys(MY_PLAYS).at(
+          Object.values(THEIR_PLAYS).indexOf(otherPlay)
+        ) as string
+      ];
+    }
+    case EXPECTED_RESULT.LOSS: {
+      switch (otherPlay) {
+        case THEIR_PLAYS.PAPER:
+          return MY_PLAYS.ROCK;
+        case THEIR_PLAYS.ROCK:
+          return MY_PLAYS.SCISSORS;
+        case THEIR_PLAYS.SCISSORS:
+          return MY_PLAYS.PAPER;
+      }
+    }
+    case EXPECTED_RESULT.WIN: {
+      switch (otherPlay) {
+        case THEIR_PLAYS.PAPER:
+          return MY_PLAYS.SCISSORS;
+        case THEIR_PLAYS.ROCK:
+          return MY_PLAYS.PAPER;
+        case THEIR_PLAYS.SCISSORS:
+          return MY_PLAYS.ROCK;
+      }
+    }
+  }
+};
 
 const getPlayResult = (
   myPlay: MY_PLAYS,
@@ -55,7 +96,7 @@ const getPlayScore = (myPlay: MY_PLAYS): number => {
   }
 };
 
-export const computeTotalPoints = async ({
+export const computeTotalPointsWhenRightValueIsPlay = async ({
   inputFilePath,
 }: {
   inputFilePath: string;
@@ -65,6 +106,28 @@ export const computeTotalPoints = async ({
 
   for await (const line of file.readLines()) {
     const [theirPlay, myPlay] = line.split(' ') as [THEIR_PLAYS, MY_PLAYS];
+    roundScore += getPlayResult(myPlay, theirPlay);
+    roundScore += getPlayScore(myPlay);
+  }
+
+  return roundScore;
+};
+
+export const computeTotalPointsWhenRightValueIsExpectedResult = async ({
+  inputFilePath,
+}: {
+  inputFilePath: string;
+}): Promise<number | undefined> => {
+  const file = await open(inputFilePath);
+  let roundScore = 0;
+
+  for await (const line of file.readLines()) {
+    const [theirPlay, expectedResult] = line.split(' ') as [
+      THEIR_PLAYS,
+      EXPECTED_RESULT
+    ];
+    const myPlay = getExpectedPlay(theirPlay, expectedResult);
+
     roundScore += getPlayResult(myPlay, theirPlay);
     roundScore += getPlayScore(myPlay);
   }
