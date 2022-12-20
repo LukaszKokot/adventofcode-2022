@@ -3,7 +3,7 @@ import {
   computeSumOfPriorities,
 } from './advent.003';
 
-describe('Advent 02', () => {
+describe('Advent 03', () => {
   describe('computeSumOfPriorities', () => {
     describe('On an empty file', () => {
       it('should return 0', async () => {
