@@ -21,13 +21,19 @@ class State {
     count,
     from,
     to,
+    moveCratesOnyByOne,
   }: {
     count: number;
     from: number;
     to: number;
+    moveCratesOnyByOne: boolean;
   }): void {
     const crates = this.piles[from].splice(-count, count);
-    this.piles[to].push(...crates.reverse());
+    if (moveCratesOnyByOne) {
+      this.piles[to].push(...crates.reverse());
+    } else {
+      this.piles[to].push(...crates);
+    }
   }
 
   public toString(): string {
@@ -44,6 +50,8 @@ enum LineType {
 
 class StateParser {
   private state: State | undefined = undefined;
+
+  constructor(private readonly options: { moveCratesOneByOne: boolean }) {}
 
   public getState(): State | undefined {
     return this.state;
@@ -88,6 +96,7 @@ class StateParser {
       count: +numberOfCrates,
       from: +from - 1,
       to: +to - 1,
+      moveCratesOnyByOne: this.options.moveCratesOneByOne,
     });
   }
 
@@ -111,11 +120,17 @@ class StateParser {
 
 export const computeFinalCratesState = async ({
   inputFilePath,
+  options = {
+    moveCratesOneByOne: true,
+  },
 }: {
   inputFilePath: string;
+  options?: {
+    moveCratesOneByOne: boolean;
+  };
 }): Promise<string> => {
   const file = await open(inputFilePath);
-  const parser = new StateParser();
+  const parser = new StateParser(options);
   let line: string;
 
   for await (line of file.readLines()) {
