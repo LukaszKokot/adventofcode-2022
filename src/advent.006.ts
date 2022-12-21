@@ -13,10 +13,12 @@ const hasDuplicatesInString = (chunk: string): boolean => {
   return false;
 };
 
-export const findStartOfPacketInStream = async ({
+const findStartOfDistinctiveCharactersInStream = async ({
   inputFilePath,
+  countOfDistinctiveCharacters,
 }: {
   inputFilePath: string;
+  countOfDistinctiveCharacters: number;
 }): Promise<number> => {
   const file = await open(inputFilePath);
   let index = -1;
@@ -32,7 +34,7 @@ export const findStartOfPacketInStream = async ({
         index++;
         currentStream += chunk.toString();
 
-        if (currentStream.length === 4) {
+        if (currentStream.length === countOfDistinctiveCharacters) {
           if (!hasDuplicatesInString(currentStream)) {
             readable.close();
             return resolve(index + 1);
@@ -46,5 +48,27 @@ export const findStartOfPacketInStream = async ({
     readable.on('end', () => {
       return resolve(-1);
     });
+  });
+};
+
+export const findStartOfPacketInStream = async ({
+  inputFilePath,
+}: {
+  inputFilePath: string;
+}): Promise<number> => {
+  return findStartOfDistinctiveCharactersInStream({
+    inputFilePath,
+    countOfDistinctiveCharacters: 4,
+  });
+};
+
+export const findStartOfMessageInStream = async ({
+  inputFilePath,
+}: {
+  inputFilePath: string;
+}): Promise<number> => {
+  return findStartOfDistinctiveCharactersInStream({
+    inputFilePath,
+    countOfDistinctiveCharacters: 14,
   });
 };
