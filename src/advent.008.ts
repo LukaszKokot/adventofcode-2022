@@ -75,3 +75,71 @@ export const getVisibleTrees = async ({
 
   return countVisibleTrees(trees);
 };
+
+const computeHighestScenicScoreOfTreeOnLine = (
+  treePosition: number,
+  lineOfTrees: number[]
+): number => {
+  let treesOnTheLeft = 0;
+  let treesOnTheRight = 0;
+
+  if (treePosition === 0 || treePosition == lineOfTrees.length - 1) {
+    return 0;
+  }
+
+  for (let tree = treePosition - 1; tree >= 0; tree--) {
+    treesOnTheLeft++;
+
+    if (lineOfTrees[treePosition] <= lineOfTrees[tree]) {
+      break;
+    }
+  }
+
+  for (let tree = treePosition + 1; tree < lineOfTrees.length; tree++) {
+    treesOnTheRight++;
+
+    if (lineOfTrees[treePosition] <= lineOfTrees[tree]) {
+      break;
+    }
+  }
+
+  return Math.max(treesOnTheLeft, 1) * Math.max(treesOnTheRight, 1);
+};
+
+const computeHighestScenicScore = (forest: number[][]): number => {
+  let highestScore = 0;
+  let score = 0;
+
+  for (let x = 0; x < forest.length; x++) {
+    for (let y = 0; y < forest[x].length; y++) {
+      score =
+        computeHighestScenicScoreOfTreeOnLine(y, forest[x]) *
+        computeHighestScenicScoreOfTreeOnLine(
+          x,
+          getLineFromVerticalLineOfForest(y, forest)
+        );
+
+      if (score > highestScore) {
+        highestScore = score;
+      }
+    }
+  }
+
+  return highestScore;
+};
+
+export const getTreeWithHighestScenicScore = async ({
+  inputFilePath,
+}: {
+  inputFilePath: string;
+}): Promise<number> => {
+  const file = await open(inputFilePath);
+  let line: string;
+  let trees: number[][] = [];
+
+  for await (line of file.readLines()) {
+    trees.push([...line].map(c => +c));
+  }
+
+  return computeHighestScenicScore(trees);
+};
